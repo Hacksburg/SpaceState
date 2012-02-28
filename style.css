@@ -1,0 +1,64 @@
+body{
+  margin:0;
+	background:url(frack_logo.png) left 20px no-repeat;
+	color:#eee;
+	font:23px/1.4 serif;
+}
+.open{
+  background-color:#381;
+}
+.closed{
+  background-color:#b11;
+}
+div{
+  margin:-20px auto;
+  border:7px solid #c83;
+}
+p{
+  margin:0 auto;
+  width:60%;
+}
+.box{
+  position:relative;
+  padding:40px;
+  width:50%;
+  background:#333;
+  text-align:center;
+  -moz-border-radius:2em;
+  -webkit-border-radius:2em;
+  border-radius:2em;
+  z-index:1;
+}
+.dashes{
+  width:20%;
+  height:160px;
+  border-width:0 5px;
+}
+.error{
+  margin:-15px 0 15px;
+  width:100%;
+  color:#f33;
+}
+/* ********************************************************************
+ * Rotation styles
+ *
+ * Do not rotate form fields, mobile browsers fail to display if you do
+ * ***************************************************************** */
+.slant_left,
+.slant_right input{
+  -webkit-transform:rotate(-2deg);
+  -moz-transform:rotate(-2deg);
+}
+.slant_right,
+.slant_left input{
+  -webkit-transform:rotate(2deg);
+  -moz-transform:rotate(2deg);
+}
+.dashes.slant_left{
+  -webkit-transform:rotate(-5deg);
+  -moz-transform:rotate(-5deg);
+}
+.dashes.slant_right{
+  -webkit-transform:rotate(5deg);
+  -moz-transform:rotate(5deg);
+}
