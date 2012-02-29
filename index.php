@@ -12,19 +12,15 @@
 // https://hackerspaces.nl/spaceapi/
 //
 // /////////////////////////////////////////////////////////////////////////////
-include 'json.class.php';
-include 'twitter.class.php';
-$config = parse_ini_file('spacestate.ini', true);
-
-
-function OpenDatabase() {
-  global $config;
-  return new PDO(sprintf('sqlite:%s', $config['status']['database']));
-}
+require 'json.class.php';
+require 'twitter.class.php';
+require 'config.inc.php';
+define('SQLITE_DB', 'sqlite:checkin.sqlite');
+define('STATUSFILE', 'status.txt');
 
 
 function RecentCheckins() {
-  $db = OpenDatabase();
+  $db = new PDO(SQLITE_DB);
   $query = 'SELECT * FROM `event` ORDER BY `ID` DESC LIMIT 10';
   $checkins = array();
   foreach ($db->query($query) as $checkin) {
@@ -37,7 +33,7 @@ function RecentCheckins() {
 
 
 function RecordCheckin($newstate) {
-  $db = OpenDatabase();
+  $db = new PDO(SQLITE_DB);
   $query = $db->prepare('INSERT INTO `event` (`action`, `timestamp`)
                          VALUES (:action, :timestamp)');
   $query->execute(array(':action' => ($newstate) ? 'check-in' : 'check-out',
@@ -46,15 +42,13 @@ function RecordCheckin($newstate) {
 
 
 function SpaceStatus() {
-  global $config;
-  return (bool) file_get_contents($config['status']['statusfile']);
+  return (bool) file_get_contents(STATUSFILE);
 }
 
 
 function SetSpaceStatus($status, $tweet=true) {
-  global $config;
   if ($status != SpaceStatus()) {
-    $fp = fopen($config['status']['statusfile'], 'w');
+    $fp = fopen(STATUSFILE, 'w');
     fwrite($fp, $status ? '1' : '0');
     fclose($fp);
     RecordCheckin($status);
@@ -68,10 +62,8 @@ function SetSpaceStatus($status, $tweet=true) {
 
 function TweetSpaceState($status) {
   try {
-    global $config;
-	  $twitter = new Twitter(
-	      $config['oauth']['consumerKey'], $config['oauth']['consumerSecret'],
-	      $config['oauth']['accessToken'], $config['oauth']['accessTokenSecret']);
+	  $twitter = new Twitter(OAUTH_CONSUMERKEY, OAUTH_CONSUMERSECRET,
+	                         OAUTH_ACCESSTOKEN, OAUTH_ACCESSTOKENSECRET);
 	  $twitter->send(sprintf('The space is now %s (changed on %s)',
 	                         $status ? 'open!' :'closed.',
 	                         date('Y-n-j H:i')));
@@ -120,7 +112,7 @@ if (isset($_GET['api'])) {
   $update_error = '';
   $status = SpaceStatus();
   if (isset($_POST['pass'])) {
-    if ($_POST['pass'] != $config['status']['secret']) {
+    if ($_POST['pass'] != POST_SECRET) {
       $update_error = '<p class="error">Sorry, the password you entered is not correct.</p>';
     } elseif (!isset($_POST['newstate'])) {
       $update_error = '<p class="error">The new space state was not specified :(</p>';
