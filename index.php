@@ -1,17 +1,17 @@
 <?php
-// /////////////////////////////////////////////////////////////////////////////
-//
-// Frack space indicator as used on hackerspaces.nl
-// This script is polled by them every 5 minutes
-//
-// There is an API version available by adding '?api' to the request.
-// This will return a 1 or 0 indicating whether the space is open or not.
-//
-// There is also a JSON API interface, which is accessed through '?json'
-// This returns a reply conforming to version 0.11 of the Hackerspaces API:
-// https://hackerspaces.nl/spaceapi/
-//
-// /////////////////////////////////////////////////////////////////////////////
+/* *****************************************************************************
+ *
+ * Frack space indicator as used on hackerspaces.nl
+ * This script is polled by them every 5 minutes
+ *
+ * There is an API version available by adding '?api' to the request.
+ * This will return a 1 or 0 indicating whether the space is open or not.
+ *
+ * There is also a JSON API interface, which is accessed through '?json'
+ * This returns a reply conforming to version 0.11 of the Hackerspaces API:
+ * https://hackerspaces.nl/spaceapi/
+ *
+ * ****************************************************************************/
 require 'json.class.php';
 require 'twitter.class.php';
 require 'config.inc.php';
@@ -96,7 +96,7 @@ if (isset($_GET['api'])) {
       'lastchange' => $events[0]['t'],
       'events' => $events));
 } elseif (isset($_GET['banner'])) {
-  echo sprintf('<html>
+  printf('<html>
    <head>
      <title>Frack space indicator</title>
      <style type="text/css">* {margin:0;padding:0}</style>
