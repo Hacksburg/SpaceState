@@ -16,8 +16,8 @@ require 'json.class.php';
 require 'twitter.class.php';
 require 'config.inc.php';
 define('SQLITE_DB', 'sqlite:checkin.sqlite');
-define('STATUSFILE', 'status.txt');
-
+define('STATUS_FILE', 'status.txt');
+define('SPACE_STATUS', (bool) file_get_contents(STATUS_FILE));
 
 function RecentCheckins() {
   $db = new PDO(SQLITE_DB);
@@ -26,7 +26,7 @@ function RecentCheckins() {
   foreach ($db->query($query) as $checkin) {
     $checkins[] = array('name' => 'Frack',
                         'type' => $checkin['action'],
-                        't' => $checkin['timestamp']);
+                        't' => (int) $checkin['timestamp']);
   }
   return $checkins;
 }
@@ -36,43 +36,36 @@ function RecordCheckin($newstate) {
   $db = new PDO(SQLITE_DB);
   $query = $db->prepare('INSERT INTO `event` (`action`, `timestamp`)
                          VALUES (:action, :timestamp)');
-  $query->execute(array(':action' => ($newstate) ? 'check-in' : 'check-out',
+  $query->execute(array(':action' => $newstate ? 'check-in' : 'check-out',
                         ':timestamp' => time()));
 }
 
 
-function SpaceStatus() {
-  return (bool) file_get_contents(STATUSFILE);
-}
-
-
 function SetSpaceStatus($status, $tweet=true) {
-  if ($status != SpaceStatus()) {
-    $fp = fopen(STATUSFILE, 'w');
-    fwrite($fp, $status ? '1' : '0');
-    fclose($fp);
-    RecordCheckin($status);
-    if ($tweet) {
-      TweetSpaceState($status);
-    }
-    return (bool) $status;
+  $fp = fopen(STATUS_FILE, 'w');
+  fwrite($fp, $status ? '1' : '0');
+  fclose($fp);
+  RecordCheckin($status);
+  if ($tweet) {
+    TweetSpaceState($status);
   }
+  return $status;
 }
 
 
 function TweetSpaceState($status) {
   try {
-	  $twitter = new Twitter(OAUTH_CONSUMERKEY, OAUTH_CONSUMERSECRET,
-	                         OAUTH_ACCESSTOKEN, OAUTH_ACCESSTOKENSECRET);
-	  $twitter->send(sprintf('The space is now %s (changed on %s)',
-	                         $status ? 'open!' :'closed.',
-	                         date('Y-n-j H:i')));
-	} catch (Exception $e) {
-		echo 'Caught exception: ',  $e->getMessage(), "\n", '<br><br>';
-		echo 'Twitter API barked at us, likely because of rate limiting;';
-		echo 'Please try again after a minute.<br>';
-		echo 'If the problem persists, please contact info[at]frack.nl';
-		exit();
+    $twitter = new Twitter(OAUTH_CONSUMERKEY, OAUTH_CONSUMERSECRET,
+                           OAUTH_ACCESSTOKEN, OAUTH_ACCESSTOKENSECRET);
+    $twitter->send(sprintf('The space is now %s (changed on %s)',
+                           $status ? 'open!' :'closed.',
+                           date('Y-n-j H:i')));
+  } catch (Exception $e) {
+    echo 'Caught exception: ',  $e->getMessage(), "\n", '<br><br>';
+    echo 'Twitter API barked at us, likely because of rate limiting;';
+    echo 'Please try again after a minute.<br>';
+    echo 'If the problem persists, please contact info[at]frack.nl';
+    exit();
   }
 }
 
@@ -80,8 +73,9 @@ function TweetSpaceState($status) {
 if (isset($_GET['api'])) {
   header('Access-Control-Allow-Origin: *');
   header('Cache-Control: no-cache, must-revalidate');
+  $events = RecentCheckins();
   echo PrettyJson(array(
-      'api' => '0.11',
+      'api' => '0.12',
       'space' => 'Frack',
       'logo' => 'http://frack.nl/wiki/Frack-logo.png',
       'icon' => array(
@@ -98,27 +92,30 @@ if (isset($_GET['api'])) {
           'ml' => 'general@frack.nl'),
       'lat' => 53.197916,
       'lon' => 5.796962,
-      'open' => SpaceStatus(),
-      'events' => RecentCheckins()));
+      'open' => SPACE_STATUS,
+      'lastchange' => $events[0]['t'],
+      'events' => $events));
 } elseif (isset($_GET['banner'])) {
   echo sprintf('<html>
    <head>
      <title>Frack space indicator</title>
      <style type="text/css">* {margin:0;padding:0}</style>
    </head><body><a href="http://frack.nl"><img src="banner_%s.png" /></a></body></html>',
-   SpaceStatus() ? 'open' : 'closed');
+   SPACE_STATUS ? 'open' : 'closed');
 } else {
   // regular door script here
   $update_error = '';
-  $status = SpaceStatus();
   if (isset($_POST['pass'])) {
     if ($_POST['pass'] != POST_SECRET) {
       $update_error = '<p class="error">Sorry, the password you entered is not correct.</p>';
     } elseif (!isset($_POST['newstate'])) {
       $update_error = '<p class="error">The new space state was not specified :(</p>';
-    } else {
-      $status = SetSpaceStatus((int) $_POST['newstate']);
+    } elseif ((bool) $_POST['newstate'] != SPACE_STATUS) {
+      // Only update the status when it's different from the current.
+      $status = SetSpaceStatus((bool) $_POST['newstate']);
     }
+  } else {
+    $status = SPACE_STATUS;
   }
   $closed_replacements = array(
       'The Frack hackerspace is now closed :(',                // page title
