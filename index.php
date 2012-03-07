@@ -102,6 +102,9 @@ if (isset($_GET['api'])) {
      <style type="text/css">* {margin:0;padding:0}</style>
    </head><body><a href="http://frack.nl"><img src="banner_%s.png" /></a></body></html>',
    SPACE_STATUS ? 'open' : 'closed');
+} elseif (isset($_GET['image'])) {
+  header(sprintf('Location: /spacestate/banner_%s.png',
+                 SPACE_STATUS ? 'open' : 'closed'));
 } else {
   // regular door script here
   $update_error = '';
