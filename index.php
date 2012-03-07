@@ -73,11 +73,12 @@ function TweetSpaceState($status) {
 if (isset($_GET['api'])) {
   header('Access-Control-Allow-Origin: *');
   header('Cache-Control: no-cache, must-revalidate');
+  header('Content-Type: application/json');
   $events = RecentCheckins();
   echo PrettyJson(array(
       'api' => '0.12',
       'space' => 'Frack',
-      'logo' => 'http://frack.nl/wiki/Frack-logo.png',
+      'logo' => 'http://frack.nl/w/Frack-logo.png',
       'icon' => array(
           'closed' => 'http://frack.nl/spacestate/icon_closed.png',
           'open' => 'http://frack.nl/spacestate/icon_open.png'),
@@ -93,6 +94,7 @@ if (isset($_GET['api'])) {
       'lat' => 53.197916,
       'lon' => 5.796962,
       'open' => SPACE_STATUS,
+      'status' => SPACE_STATUS ? 'Je bent welkom' : 'Sorry, gesloten',
       'lastchange' => $events[0]['t'],
       'events' => $events));
 } elseif (isset($_GET['banner'])) {
