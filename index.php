@@ -86,7 +86,7 @@ if (isset($_GET['api'])) {
       'address' => 'Zuiderplein 33, 8911 AN, Leeuwarden, The Netherlands',
       'contact' => array(
           'phone' => '+31681563934',
-          'keymaster' => 'key-holders@frack.nl',
+          'keymaster' => array('key-holders@frack.nl'),
           'irc' => 'irc://irc.eth-0.nl/#frack',
           'twitter' => '@fracknl',
           'email' => 'info@frack.nl',
