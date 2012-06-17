@@ -1,13 +1,16 @@
 <?php
 /* *****************************************************************************
  *
- * Frack space indicator as used on hackerspaces.nl
- * This script is polled by them every 5 minutes
+ * The Frack space-state script, used for both manual and programmatic opening
+ * and closing of the space.
  *
- * There is an API version available by adding '?api' to the request.
- * This will return a 1 or 0 indicating whether the space is open or not.
+ * This is also the Frack space indicator as used on hackerspaces.nl
+ * This script is polled by them every 5 minutes (using '/?banner')
  *
- * There is also a JSON API interface, which is accessed through '?json'
+ * For use in the Frack wiki (and possibly other places) there is the '/?image'
+ * mode of access, which provides *only* the image from the banner.
+
+ * There is also a JSON API interface, which is accessed through '/?api'
  * This returns a reply conforming to version 0.11 of the Hackerspaces API:
  * https://hackerspaces.nl/spaceapi/
  *
@@ -64,7 +67,7 @@ function TweetSpaceState($status) {
     echo 'Caught exception: ',  $e->getMessage(), "\n", '<br><br>';
     echo 'Twitter API barked at us, likely because of rate limiting;';
     echo 'Please try again after a minute.<br>';
-    echo 'If the problem persists, please contact info[at]frack.nl';
+    echo 'If the problem persists, please contact info[at]frack[dot]nl';
     exit();
   }
 }
