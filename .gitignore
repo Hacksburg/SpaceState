@@ -1,0 +1,6 @@
+# Config file with passwords should not be in repo
+config.inc.php
+
+# Files created by the script should likewise not be included
+checkin.sqlite
+status.txt
