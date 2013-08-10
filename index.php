@@ -10,9 +10,8 @@
  * For use in the Frack wiki (and possibly other places) there is the '/?image'
  * mode of access, which provides *only* the image from the banner.
 
- * There is also a JSON API interface, which is accessed through '/?api'
- * This returns a reply conforming to version 0.11 of the Hackerspaces API:
- * https://hackerspaces.nl/spaceapi/
+ * There is also a SpaceAPI interface, which is accessed through '/?api'
+ * This returns an JSON object as described on http://spaceapi.net/
  *
  * ****************************************************************************/
 require 'json.class.php';
@@ -29,7 +28,7 @@ function RecentCheckins() {
   foreach ($db->query($query) as $checkin) {
     $checkins[] = array('name' => 'Frack',
                         'type' => $checkin['action'],
-                        't' => (int) $checkin['timestamp']);
+                        'timestamp' => (int) $checkin['timestamp']);
   }
   return $checkins;
 }
@@ -75,31 +74,50 @@ function TweetSpaceState($status) {
 
 if (isset($_GET['api'])) {
   header('Access-Control-Allow-Origin: *');
-  header('Cache-Control: no-cache, must-revalidate');
+  header('Cache-Control: no-cache');
   header('Content-Type: application/json');
   $events = RecentCheckins();
   echo PrettyJson(array(
-      'api' => '0.12',
+      'api' => '0.13',
       'space' => 'Frack',
       'logo' => 'http://frack.nl/w/Frack-logo.png',
-      'icon' => array(
-          'closed' => 'http://frack.nl/spacestate/icon_closed.png',
-          'open' => 'http://frack.nl/spacestate/icon_open.png'),
       'url' => 'http://frack.nl',
-      'address' => 'Zuiderplein 33, 8911 AN, Leeuwarden, The Netherlands',
+      'location' => array(
+          'address' => 'Zuiderplein 33, 8911 AN, Leeuwarden, The Netherlands',
+          'lat' => 53.197916,
+          'lon' => 5.796962),
+      'spacefed' => array(
+          'spacenet' => true,
+          'spacesaml' => false,
+          'spacephone' => false),
+      'state' => array(
+          'open' => SPACE_STATUS,
+          'lastchange' => $events[0]['timestamp'],
+          'message' => SPACE_STATUS ? 'Je bent welkom' : 'Sorry, we zijn gesloten',
+          'icon' => array(
+              'closed' => 'http://frack.nl/spacestate/icon_closed.png',
+              'open' => 'http://frack.nl/spacestate/icon_open.png')),
+      'events' => $events,
       'contact' => array(
           'phone' => '+31681563934',
           'keymaster' => array('key-holders@frack.nl'),
           'irc' => 'irc://irc.eth-0.nl/#frack',
           'twitter' => '@fracknl',
           'email' => 'info@frack.nl',
-          'ml' => 'general@frack.nl'),
-      'lat' => 53.197916,
-      'lon' => 5.796962,
-      'open' => SPACE_STATUS,
-      'status' => SPACE_STATUS ? 'Je bent welkom' : 'Sorry, gesloten',
-      'lastchange' => $events[0]['t'],
-      'events' => $events));
+          'ml' => 'general@frack.nl',
+          'issue_mail' => 'elmer.delooff@gmail.com'),
+      'issue_report_channels' => array('issue_mail'),
+      'feeds' => array(
+          'wiki' => array(
+              'type' => 'atom',
+              'url' => 'http://frack.nl/wiki/Special:RecentChanges?feed=atom'),
+          'calendar' => array(
+              'type' => 'ical',
+              'url' => 'https://www.google.com/calendar/ical/7b7vbccb6rcfuj10n1jfic30bc%40group.calendar.google.com/public/basic.ics')),
+      'cache' => array('schedule' => 'm.02'),
+      'projects' => array(
+          'http://frack.nl/wiki/Projecten',
+          'https://github.com/frack')));
 } elseif (isset($_GET['banner'])) {
   printf('<html>
    <head>
