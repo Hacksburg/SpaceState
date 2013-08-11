@@ -18,8 +18,26 @@ require 'json.class.php';
 require 'twitter.class.php';
 require 'config.inc.php';
 define('SQLITE_DB', 'sqlite:checkin.sqlite');
-define('STATUS_FILE', 'status.txt');
-define('SPACE_STATUS', (bool) file_get_contents(STATUS_FILE));
+define('STATUS_FILE', 'status_test.txt');
+define('SPACE_STATUS', (bool) trim(file_get_contents(STATUS_FILE)));
+
+class Template {
+  function __construct($template) {
+    $this->template = $template;
+  }
+
+  private function replaceCallback($m) {
+    return isset($this->replacements[$m[1]]) ? $this->replacements[$m[1]] : '';
+  }
+
+  function apply($replacements) {
+    $this->replacements = $replacements;
+    $result = preg_replace_callback(
+        '/\{(\w+)\}/', array(&$this,'replaceCallback') ,$this->template);
+    unset($this->replacements);
+    return $result;
+  }
+}
 
 function RecentCheckins() {
   $db = new PDO(SQLITE_DB);
@@ -144,44 +162,47 @@ if (isset($_GET['api'])) {
     $status = SPACE_STATUS;
   }
   $closed_replacements = array(
-      'The Frack hackerspace is now closed :(',                // page title
-      'closed',                                                // body class
-      $update_error,                                           // state update errors
-      'Sorry, but we\'re closed right now, try again later.',  // body content
-      'Are you a member? Open the space',                      // form leader
-      '1', 'Open the space');                                  // newstate and button values
-  $open_replacements = array(  // sames values as above
-      'The Frack hackerspace is now open!',
-      'open',
-      $update_error,
-      'The space is now open.<br>You are welcome to come over!',
-      'Please close the space if you are the last person to leave',
-      '0', 'Close the space');
+      'title' => 'The Frack hackerspace is now closed :(',
+      'body_class' => 'closed',
+      'message_error' => $update_error,
+      'message_state' => 'Sorry, but we\'re closed right now, try again later.',
+      'message_form' => 'Space opened but state says "no"? Open the space!',
+      'next_state' => '1',
+      'button_text' => 'Open the space');
+      
+  $open_replacements = array(
+      'title' => 'The Frack hackerspace is now open!',
+      'body_class' => 'open',
+      'message_error' => $update_error,
+      'message_state' => 'The space is now open.<br>You are welcome to come over!',
+      'message_form' => 'Please close the space if you are the last person to leave.',
+      'next_state' => '0',
+      'button_text' => 'Close the space');
 
-  vprintf('<!DOCTYPE HTML>
+  $template = new Template('<!DOCTYPE HTML>
   <html>
     <head>
       <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
       <meta name="viewport" content="initial-scale=1.0">
       <link rel="stylesheet" type="text/css" href="style.css">
-      <title>%s</title>
+      <title>{title}</title>
     </head>
-    <body class="%s">
+    <body class="{body_class}">
       <div class="dashes slant_right"></div>
-      <div class="box slant_left">%s<p>%s</p></div>
+      <div class="box slant_left">{message_error}<p>{message_state}</p></div>
       <div class="dashes slant_left"></div>
       <div class="box slant_right">
         <form method="post">
-          <p>%s:</p>
+          <p>{message_form}</p>
           <p>
             <input type="password" name="pass" />
-            <input type="hidden" name="newstate" value="%s" />
-            <input type="submit" name="submit" value="%s" />
+            <input type="hidden" name="newstate" value="{next_state}" />
+            <input type="submit" name="submit" value="{button_text}" />
           </p>
         </form>
       </div>
     </body>
-  </html>',
-  $status ? $open_replacements : $closed_replacements);
+  </html>');
+  echo $template->apply($status ? $open_replacements : $closed_replacements);
 }
 ?>
