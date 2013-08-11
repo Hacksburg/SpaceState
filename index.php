@@ -119,7 +119,10 @@ if (isset($_GET['api'])) {
       'events' => $events,
       'contact' => array(
           'phone' => '+31681563934',
-          'keymaster' => array('key-holders@frack.nl'),
+          'keymaster' => array(
+              array(
+                  'name' => 'Keyholders mailing list',
+                  'email' => 'key-holders@frack.nl')),
           'irc' => 'irc://irc.eth-0.nl/#frack',
           'twitter' => '@fracknl',
           'email' => 'info@frack.nl',
