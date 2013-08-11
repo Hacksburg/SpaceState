@@ -18,7 +18,7 @@ require 'json.class.php';
 require 'twitter.class.php';
 require 'config.inc.php';
 define('SQLITE_DB', 'sqlite:checkin.sqlite');
-define('STATUS_FILE', 'status_test.txt');
+define('STATUS_FILE', 'status.txt');
 define('STATUS_PAGE', 'status_page.html');
 define('SPACE_STATUS', (bool) trim(file_get_contents(STATUS_FILE)));
 
