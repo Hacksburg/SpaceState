@@ -19,6 +19,7 @@ require 'twitter.class.php';
 require 'config.inc.php';
 define('SQLITE_DB', 'sqlite:checkin.sqlite');
 define('STATUS_FILE', 'status_test.txt');
+define('STATUS_PAGE', 'status_page.html');
 define('SPACE_STATUS', (bool) trim(file_get_contents(STATUS_FILE)));
 
 class Template {
@@ -148,6 +149,7 @@ if (isset($_GET['api'])) {
                  SPACE_STATUS ? 'open' : 'closed'));
 } else {
   // regular door script here
+  $status = SPACE_STATUS;
   $update_error = '';
   if (isset($_POST['pass'])) {
     if ($_POST['pass'] != POST_SECRET) {
@@ -158,51 +160,28 @@ if (isset($_GET['api'])) {
       // Only update the status when it's different from the current.
       $status = SetSpaceStatus((bool) $_POST['newstate']);
     }
-  } else {
-    $status = SPACE_STATUS;
   }
-  $closed_replacements = array(
-      'title' => 'The Frack hackerspace is now closed :(',
-      'body_class' => 'closed',
-      'message_error' => $update_error,
-      'message_state' => 'Sorry, but we\'re closed right now, try again later.',
-      'message_form' => 'Space opened but state says "no"? Open the space!',
-      'next_state' => '1',
-      'button_text' => 'Open the space');
       
-  $open_replacements = array(
-      'title' => 'The Frack hackerspace is now open!',
-      'body_class' => 'open',
-      'message_error' => $update_error,
-      'message_state' => 'The space is now open.<br>You are welcome to come over!',
-      'message_form' => 'Please close the space if you are the last person to leave.',
-      'next_state' => '0',
-      'button_text' => 'Close the space');
-
-  $template = new Template('<!DOCTYPE HTML>
-  <html>
-    <head>
-      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-      <meta name="viewport" content="initial-scale=1.0">
-      <link rel="stylesheet" type="text/css" href="style.css">
-      <title>{title}</title>
-    </head>
-    <body class="{body_class}">
-      <div class="dashes slant_right"></div>
-      <div class="box slant_left">{message_error}<p>{message_state}</p></div>
-      <div class="dashes slant_left"></div>
-      <div class="box slant_right">
-        <form method="post">
-          <p>{message_form}</p>
-          <p>
-            <input type="password" name="pass" />
-            <input type="hidden" name="newstate" value="{next_state}" />
-            <input type="submit" name="submit" value="{button_text}" />
-          </p>
-        </form>
-      </div>
-    </body>
-  </html>');
-  echo $template->apply($status ? $open_replacements : $closed_replacements);
+  $template = new Template(file_get_contents(STATUS_PAGE));
+  if ($status) {
+    $replacements = array(
+        'title' => 'The Frack hackerspace is now open!',
+        'body_class' => 'open',
+        'message_error' => $update_error,
+        'message_state' => 'The space is now open.<br>You are welcome to come over!',
+        'message_form' => 'Please close the space if you are the last person to leave.',
+        'next_state' => '0',
+        'button_text' => 'Close the space');
+  } else {
+    $replacements = array(
+        'title' => 'The Frack hackerspace is now closed :(',
+        'body_class' => 'closed',
+        'message_error' => $update_error,
+        'message_state' => 'Sorry, but we\'re closed right now, try again later.',
+        'message_form' => 'Space opened but state says "no"? Open the space!',
+        'next_state' => '1',
+        'button_text' => 'Open the space');
+  }
+  echo $template->apply($replacements);
 }
 ?>

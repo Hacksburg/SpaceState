@@ -1,0 +1,24 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <title>{title}</title>
+  </head>
+  <body class="{body_class}">
+    <div class="dashes slant_right"></div>
+    <div class="box slant_left">{message_error}<p>{message_state}</p></div>
+    <div class="dashes slant_left"></div>
+    <div class="box slant_right">
+      <form method="post">
+        <p>{message_form}</p>
+        <p>
+          <input type="password" name="pass" />
+          <input type="hidden" name="newstate" value="{next_state}" />
+          <input type="submit" name="submit" value="{button_text}" />
+        </p>
+      </form>
+    </div>
+  </body>
+</html>
