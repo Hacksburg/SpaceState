@@ -59,6 +59,7 @@ function RecordCheckin($newstate) {
                          VALUES (:action, :timestamp)');
   $query->execute(array(':action' => $newstate ? 'check-in' : 'check-out',
                         ':timestamp' => time()));
+  $db->commit();
 }
 
 
@@ -164,7 +165,7 @@ if (isset($_GET['api'])) {
       $status = SetSpaceStatus((bool) $_POST['newstate']);
     }
   }
-      
+
   $template = new Template(file_get_contents(STATUS_PAGE));
   if ($status) {
     $replacements = array(
