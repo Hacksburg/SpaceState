@@ -59,7 +59,6 @@ function RecordCheckin($newstate) {
                          VALUES (:action, :timestamp)');
   $query->execute(array(':action' => $newstate ? 'check-in' : 'check-out',
                         ':timestamp' => time()));
-  $db->commit();
 }
 
 
