@@ -15,7 +15,7 @@
  *
  * ****************************************************************************/
 require 'json.class.php';
-require 'twitter.class.php';
+require 'twitteroauth/twitteroauth.php';
 require 'config.inc.php';
 define('SQLITE_DB', 'sqlite:checkin.sqlite');
 define('STATUS_FILE', 'status.txt');
@@ -76,11 +76,14 @@ function SetSpaceStatus($status, $tweet=true) {
 
 function TweetSpaceState($status) {
   try {
-    $twitter = new Twitter(OAUTH_CONSUMERKEY, OAUTH_CONSUMERSECRET,
-                           OAUTH_ACCESSTOKEN, OAUTH_ACCESSTOKENSECRET);
-    $twitter->send(sprintf('The space is now %s (changed on %s)',
-                           $status ? 'open!' :'closed.',
-                           date('Y-n-j H:i')));
+    $twitter_api = new TwitterOAuth(
+        OAUTH_CONSUMERKEY, OAUTH_CONSUMERSECRET,
+        OAUTH_ACCESSTOKEN, OAUTH_ACCESSTOKENSECRET);
+    $parameters = array('status' => sprintf(
+        'The space is now %s (changed on %s)',
+        $status ? 'open!' :'closed.',
+        date('Y-n-j H:i')));
+    $twitter_api->post('statuses/update', $parameters);
   } catch (Exception $e) {
     echo 'Caught exception: ',  $e->getMessage(), "\n", '<br><br>';
     echo 'Twitter API barked at us, likely because of rate limiting;';
