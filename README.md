@@ -1,4 +1,6 @@
-# Frack SpaceState indicator
+# Hacksburg SpaceState indicator
+
+**This is not ready for production yet. DO NOT DEPLOY without checking with Andrew Mike first.**
 
 This indicator script fulfills a number of purposes:
 
