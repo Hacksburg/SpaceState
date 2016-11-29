@@ -45,7 +45,7 @@ function RecentCheckins() {
   $query = 'SELECT * FROM `event` ORDER BY `ID` DESC LIMIT 10';
   $checkins = array();
   foreach ($db->query($query) as $checkin) {
-    $checkins[] = array('name' => 'Frack',
+    $checkins[] = array('name' => 'Hacksburg',
                         'type' => $checkin['action'],
                         'timestamp' => (int) $checkin['timestamp']);
   }
@@ -88,7 +88,7 @@ function TweetSpaceState($status) {
     echo 'Caught exception: ',  $e->getMessage(), "\n", '<br><br>';
     echo 'Twitter API barked at us, likely because of rate limiting;';
     echo 'Please try again after a minute.<br>';
-    echo 'If the problem persists, please contact info[at]frack[dot]nl';
+    echo 'If the problem persists, please contact board[at]hacksburg[dot]org';
     exit();
   }
 }
@@ -101,54 +101,40 @@ if (isset($_GET['api'])) {
   $events = RecentCheckins();
   echo PrettyJson(array(
       'api' => '0.13',
-      'space' => 'Frack',
-      'logo' => 'http://frack.nl/w/Frack-logo.png',
-      'url' => 'http://frack.nl',
+      'space' => 'Hacksburg',
+      'logo' => 'http://hacksburg.org/images/hacksburg.png',
+      'url' => 'http://hacksburg.org',
       'location' => array(
-          'address' => 'Zuiderplein 33, 8911 AN, Leeuwarden, The Netherlands',
-          'lat' => 53.197916,
-          'lon' => 5.796962),
-      'spacefed' => array(
-          'spacenet' => true,
-          'spacesaml' => false,
-          'spacephone' => false),
+          'address' => '2200 Kraft Drive, Suite 1475, Blacksburg, VA, 24060 United States',
+          'lat' => 37.19986,
+          'lon' => -80.40795),
       'state' => array(
           'open' => SPACE_STATUS,
-          'lastchange' => $events[0]['timestamp'],
-          'message' => SPACE_STATUS ? 'Je bent welkom' : 'Sorry, we zijn gesloten',
-          'icon' => array(
-              'closed' => 'http://frack.nl/spacestate/icon_closed.png',
-              'open' => 'http://frack.nl/spacestate/icon_open.png')),
+          'lastchange' => $events[0]['timestamp']),
       'events' => $events,
       'contact' => array(
-          'phone' => '+31681563934',
-          'keymaster' => array(
-              array(
-                  'name' => 'Keyholders mailing list',
-                  'email' => 'key-holders@frack.nl')),
-          'irc' => 'irc://irc.eth-0.nl/#frack',
-          'twitter' => '@fracknl',
-          'email' => 'info@frack.nl',
-          'ml' => 'general@frack.nl',
-          'issue_mail' => 'elmer.delooff@gmail.com'),
+          'phone' => '+1 540 904 1701',
+          'facebook' => 'https://www.facebook.com/groups/405322866198425'
+          'twitter' => '@hacksburg',
+          'email' => 'board@hacksburg.org',
+          'issue_mail' => 'board@hacksburg.org'),
       'issue_report_channels' => array('issue_mail'),
       'feeds' => array(
           'wiki' => array(
-              'type' => 'atom',
-              'url' => 'http://frack.nl/wiki/Special:RecentChanges?feed=atom'),
+              'type' => 'rss',
+              'url' => 'https://wiki.hacksburg.org/feed.php'),
           'calendar' => array(
               'type' => 'ical',
-              'url' => 'https://www.google.com/calendar/ical/7b7vbccb6rcfuj10n1jfic30bc%40group.calendar.google.com/public/basic.ics')),
+              'url' => 'https://calendar.google.com/calendar/ical/hacksburg.org_qtuisjndp6q1jjebup2biu66uk%40group.calendar.google.com/public/basic.ics')),
       'cache' => array('schedule' => 'm.02'),
       'projects' => array(
-          'http://frack.nl/wiki/Projecten',
-          'https://github.com/frack')));
+          'https://github.com/hacksburg')));
 } elseif (isset($_GET['banner'])) {
   printf('<html>
    <head>
      <title>Frack space indicator</title>
      <style type="text/css">* {margin:0;padding:0}</style>
-   </head><body><a href="http://frack.nl"><img src="banner_%s.png" /></a></body></html>',
+   </head><body><a href="http://hacksburg.org"><img src="banner_%s.png" /></a></body></html>',
    SPACE_STATUS ? 'open' : 'closed');
 } elseif (isset($_GET['image'])) {
   header(sprintf('Location: /spacestate/banner_%s.png',
@@ -171,7 +157,7 @@ if (isset($_GET['api'])) {
   $template = new Template(file_get_contents(STATUS_PAGE));
   if ($status) {
     $replacements = array(
-        'title' => 'The Frack hackerspace is now open!',
+        'title' => 'Hacksburg is now open!',
         'body_class' => 'open',
         'message_error' => $update_error,
         'message_state' => 'The space is now open.<br>You are welcome to come over!',
@@ -180,7 +166,7 @@ if (isset($_GET['api'])) {
         'button_text' => 'Close the space');
   } else {
     $replacements = array(
-        'title' => 'The Frack hackerspace is now closed :(',
+        'title' => 'Hacksburg is now closed :(',
         'body_class' => 'closed',
         'message_error' => $update_error,
         'message_state' => 'Sorry, but we\'re closed right now, try again later.',
