@@ -1,32 +1,31 @@
 body{
   margin:0;
-	background:url(frack_logo.png) left 20px no-repeat;
-	color:#eee;
-	font:23px/1.4 serif;
+	background:url(frack_logo.png) left 20px no-repeat #333;
+	font:23px/1.4 'Electrolize',sans-serif;
 }
 .open{
-  background-color:#381;
+  color: #0f0;
 }
 .closed{
-  background-color:#b11;
+  color: #f00;
 }
 div{
   margin:-20px auto;
-  border:7px solid #c83;
+  border:7px solid #999;
 }
 p{
   margin:0 auto;
   width:60%;
 }
+form p{
+    margin-bottom: 15px;
+}
 .box{
   position:relative;
   padding:40px;
   width:50%;
-  background:#333;
+  background:#000;
   text-align:center;
-  -moz-border-radius:2em;
-  -webkit-border-radius:2em;
-  border-radius:2em;
   z-index:1;
 }
 .dashes{
@@ -38,27 +37,4 @@ p{
   margin:-15px 0 15px;
   width:100%;
   color:#f33;
-}
-/* ********************************************************************
- * Rotation styles
- *
- * Do not rotate form fields, mobile browsers fail to display if you do
- * ***************************************************************** */
-.slant_left,
-.slant_right input{
-  -webkit-transform:rotate(-2deg);
-  -moz-transform:rotate(-2deg);
-}
-.slant_right,
-.slant_left input{
-  -webkit-transform:rotate(2deg);
-  -moz-transform:rotate(2deg);
-}
-.dashes.slant_left{
-  -webkit-transform:rotate(-5deg);
-  -moz-transform:rotate(-5deg);
-}
-.dashes.slant_right{
-  -webkit-transform:rotate(5deg);
-  -moz-transform:rotate(5deg);
 }
