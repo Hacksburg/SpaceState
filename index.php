@@ -116,6 +116,7 @@ if (isset($_GET['api'])) {
           'phone' => '+1 540 904 1701',
           'facebook' => 'https://www.facebook.com/groups/405322866198425'
           'twitter' => '@hacksburg',
+          'ml' => 'discussion@hacksburg.org',
           'email' => 'board@hacksburg.org',
           'issue_mail' => 'board@hacksburg.org'),
       'issue_report_channels' => array('issue_mail'),
@@ -169,8 +170,8 @@ if (isset($_GET['api'])) {
         'title' => 'Hacksburg is now closed :(',
         'body_class' => 'closed',
         'message_error' => $update_error,
-        'message_state' => 'Sorry, but we\'re closed right now, try again later.',
-        'message_form' => 'Space opened but state says "no"? Open the space!',
+        'message_state' => 'We\'re closed right now.',
+        'message_form' => 'Space opened but state says "closed"? Open the space!',
         'next_state' => '1',
         'button_text' => 'Open the space');
   }
